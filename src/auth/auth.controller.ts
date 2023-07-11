@@ -14,13 +14,13 @@ import { ALREADY_REGISTERED_ERROR } from './authConstants';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UsePipes(new ValidationPipe())
-  @Post('register')
-  async register(@Body() dto: AuthDto) {
-    const oldUser = await this.authService.findUser(dto.login);
-    if (oldUser) {
-      throw new BadRequestException(ALREADY_REGISTERED_ERROR);
-    }
-    return this.authService.createUser(dto);
-  }
+  //   @UsePipes(new ValidationPipe())
+  //   @Post('register')
+  //   async register(@Body() dto: AuthDto) {
+  //     const oldUser = await this.authService.findUser(dto.login);
+  //     if (oldUser) {
+  //       throw new BadRequestException(ALREADY_REGISTERED_ERROR);
+  //     }
+  //     return this.authService.createUser(dto);
+  //   }
 }
