@@ -11,14 +11,14 @@ export class AuthService {
     @InjectModel(UserModel) private readonly userModel: Model<UserModel>,
   ) {}
 
-  async findUser(login: string) {
-    return this.userModel.findOne({ login }).exec();
+  async findUser(userName: string) {
+    return this.userModel.findOne({ userName }).exec();
   }
 
   async createUser(dto: AuthDto) {
     const salt = await genSalt(10);
     const newUser = new this.userModel({
-      login: dto.login,
+      userName: dto.login,
       passwordHash: await hash(dto.password, salt),
     });
     return newUser.save();
