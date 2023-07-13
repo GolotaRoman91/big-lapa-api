@@ -15,7 +15,6 @@ export class MainService {
 
   async create(dto: MainDto): Promise<DocumentType<MainModel>> {
     const model = getModelForClass(MainModel);
-
-    return model.create(dto);
+    return model.findOneAndUpdate({}, dto, { upsert: true, new: true });
   }
 }
