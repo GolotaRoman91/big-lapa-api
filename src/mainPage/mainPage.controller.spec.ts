@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MainController } from './main.controller';
+import { MainController } from './mainPage.controller';
 
 describe('MainController', () => {
   let controller: MainController;

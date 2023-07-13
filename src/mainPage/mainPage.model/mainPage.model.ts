@@ -1,5 +1,6 @@
 import { prop } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { Types } from 'mongoose';
 
 export interface MainModel extends Base {}
 export class MainModel extends TimeStamps {
@@ -7,7 +8,7 @@ export class MainModel extends TimeStamps {
   first_phoneNumber: string;
 
   @prop()
-  secind_phoneNumber: string;
+  second_phoneNumber: string;
 
   @prop()
   email: string;
