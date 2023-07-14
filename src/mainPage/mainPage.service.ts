@@ -17,4 +17,8 @@ export class MainService {
     const model = getModelForClass(MainModel);
     return model.findOneAndUpdate({}, dto, { upsert: true, new: true });
   }
+
+  async getMainData(): Promise<MainModel> {
+    return this.mainModel.findOne();
+  }
 }
