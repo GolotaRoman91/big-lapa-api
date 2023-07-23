@@ -23,10 +23,17 @@ export class S3Controller {
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: any, // Получите все значения из тела запроса
+    @Body() body: any,
   ) {
-    const { description, category } = body; // Извлеките значения description и category из body
+    const { description, category } = body;
     const key = await this.s3Service.uploadFile(file, description, category);
     return { imageUrl: key };
+  }
+
+  @Get('category/:category')
+  async getImagesByCategory(@Param('category') category: string) {
+    const images = await this.s3Service.getImagesByCategory(category);
+    const imageUrls = images.map((image) => image.imageUrl);
+    return imageUrls;
   }
 }

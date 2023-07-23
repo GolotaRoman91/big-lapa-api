@@ -36,7 +36,6 @@ export class S3Service {
     const result = await this.s3.upload(uploadParams).promise();
     await unlinkFile(file.path);
 
-    // Сохранение информации о файле в базе данных
     const fileRecord = new this.imageModel({
       name: file.originalname,
       description,
@@ -56,5 +55,9 @@ export class S3Service {
     };
 
     return this.s3.getObject(downloadParams).createReadStream();
+  }
+
+  async getImagesByCategory(category: string): Promise<Image[]> {
+    return this.imageModel.find({ category }).exec();
   }
 }
