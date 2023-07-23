@@ -41,7 +41,7 @@ export class S3Service {
       name: file.originalname,
       description,
       category,
-      imagePath: `/images/${result.Key}`,
+      imageUrl: result.Key,
     });
 
     await fileRecord.save();

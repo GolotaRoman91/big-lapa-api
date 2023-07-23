@@ -27,6 +27,6 @@ export class S3Controller {
   ) {
     const { description, category } = body; // Извлеките значения description и category из body
     const key = await this.s3Service.uploadFile(file, description, category);
-    return { imagePath: `/images/${key}` };
+    return { imageUrl: key };
   }
 }
