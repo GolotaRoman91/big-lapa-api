@@ -6,6 +6,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Body,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
@@ -15,8 +16,9 @@ export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}
 
   @Get(':key')
-  getImage(@Param('key') key: string) {
-    return this.s3Service.getFileStream(key);
+  async getImage(@Param('key') key: string, @Res() res: Response) {
+    const fileStream = this.s3Service.getFileStream(key);
+    fileStream.pipe(res);
   }
 
   @Post()
