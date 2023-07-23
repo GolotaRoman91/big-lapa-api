@@ -11,5 +11,5 @@ export class Image {
   category: string;
 
   @prop({ required: true })
-  imagePath: string;
+  imageUrl: string;
 }
