@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
+import { Response } from 'express';
 
 @Controller('images')
 export class S3Controller {
