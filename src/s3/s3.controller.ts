@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Body,
   Res,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
@@ -38,5 +39,11 @@ export class S3Controller {
     const images = await this.s3Service.getImagesByCategory(category);
     const imageUrls = images.map((image) => image.imageUrl);
     return imageUrls;
+  }
+
+  @Delete(':key')
+  async deleteImage(@Param('key') key: string) {
+    await this.s3Service.deleteFile(key);
+    return { message: 'File deleted successfully' };
   }
 }

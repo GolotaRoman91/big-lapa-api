@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Delete, Injectable, Param } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import * as fs from 'fs';
 import { promisify } from 'util';
@@ -59,5 +59,15 @@ export class S3Service {
 
   async getImagesByCategory(category: string): Promise<Image[]> {
     return this.imageModel.find({ category }).exec();
+  }
+
+  async deleteFile(fileKey: string): Promise<void> {
+    // const deleteParams = {
+    //   Key: fileKey,
+    //   Bucket: process.env.AWS_BUCKET_NAME,
+    // };
+
+    // await this.s3.deleteObject(deleteParams).promise();
+    await this.imageModel.deleteOne({ imageUrl: fileKey }).exec();
   }
 }
