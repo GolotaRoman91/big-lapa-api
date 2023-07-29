@@ -8,10 +8,12 @@ import {
   Body,
   Res,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('images')
 export class S3Controller {
@@ -23,6 +25,7 @@ export class S3Controller {
     fileStream.pipe(res);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
@@ -41,6 +44,7 @@ export class S3Controller {
     return imageUrls;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':key')
   async deleteImage(@Param('key') key: string) {
     await this.s3Service.deleteFile(key);
