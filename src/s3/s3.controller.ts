@@ -42,6 +42,26 @@ export class S3Controller {
     return { imageUrl: key };
   }
 
+  // @UseGuards(JwtAuthGuard)
+  @Post('documents')
+  @UseInterceptors(FileInterceptor('document'))
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No document uploaded');
+    }
+
+    const { description, category } = body;
+    const key = await this.s3Service.uploadDocument(
+      file,
+      description,
+      category,
+    );
+    return { documentUrl: key };
+  }
+
   @Get('category/:category')
   async getImagesByCategory(@Param('category') category: string) {
     const images = await this.s3Service.getImagesByCategory(category);
@@ -49,10 +69,24 @@ export class S3Controller {
     return imageUrls;
   }
 
+  @Get('documents/category/:category')
+  async getDocumentsByCategory(@Param('category') category: string) {
+    const documents = await this.s3Service.getDocumentsByCategory(category);
+    const documentUrls = documents.map((document) => document.documentURI);
+    return documentUrls;
+  }
+
   // @UseGuards(JwtAuthGuard)
   @Delete(':key')
   async deleteImage(@Param('key') key: string) {
     await this.s3Service.deleteFile(key);
+    return { message: 'File deleted successfully' };
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Delete('documents/:key')
+  async deleteFile(@Param('key') key: string) {
+    await this.s3Service.deleteDocument(key);
     return { message: 'File deleted successfully' };
   }
 }
