@@ -8,10 +8,13 @@ import {
   Body,
   Res,
   Delete,
+  UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('images')
 export class S3Controller {
@@ -23,12 +26,17 @@ export class S3Controller {
     fileStream.pipe(res);
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,
   ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
     const { description, category } = body;
     const key = await this.s3Service.uploadFile(file, description, category);
     return { imageUrl: key };
@@ -41,6 +49,7 @@ export class S3Controller {
     return imageUrls;
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Delete(':key')
   async deleteImage(@Param('key') key: string) {
     await this.s3Service.deleteFile(key);
