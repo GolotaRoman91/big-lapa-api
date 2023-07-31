@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { UserModel } from './auth.model/auth.model';
 import { Model } from 'mongoose';
@@ -48,5 +52,25 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async changePassword(
+    userName: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.findUser(userName);
+    if (!user) {
+      throw new NotFoundException(USER_NOT_FOUND_ERROR);
+    }
+
+    const isCorrectPassword = await compare(oldPassword, user.passwordHash);
+    if (!isCorrectPassword) {
+      throw new UnauthorizedException(WRONG_PASSWORD_ERROR);
+    }
+
+    const salt = await genSalt(10);
+    user.passwordHash = await hash(newPassword, salt);
+    await user.save();
   }
 }

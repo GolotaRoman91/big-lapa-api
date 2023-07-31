@@ -7,9 +7,13 @@ import {
   ValidationPipe,
   BadRequestException,
   HttpCode,
+  UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { ALREADY_REGISTERED_ERROR } from './authConstants';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import { UserName } from 'src/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +35,15 @@ export class AuthController {
   async login(@Body() { login, password }: AuthDto) {
     const { userName } = await this.authService.validateUser(login, password);
     return this.authService.login(userName);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-password')
+  async changePassword(
+    @UserName() userName: string,
+    @Body('oldPassword') oldPassword: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    return this.authService.changePassword(userName, oldPassword, newPassword);
   }
 }
