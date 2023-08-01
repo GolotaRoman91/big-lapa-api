@@ -44,6 +44,7 @@ export class AuthController {
     @Body('oldPassword') oldPassword: string,
     @Body('newPassword') newPassword: string,
   ) {
-    return this.authService.changePassword(userName, oldPassword, newPassword);
+    await this.authService.changePassword(userName, oldPassword, newPassword);
+    return { message: 'Password changed' };
   }
 }
