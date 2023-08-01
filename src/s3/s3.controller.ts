@@ -15,6 +15,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import * as mimeTypes from 'mime-types';
+import { extname } from 'path';
 
 @Controller('images')
 export class S3Controller {
@@ -28,7 +30,23 @@ export class S3Controller {
 
   // @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+          cb(null, true);
+        } else {
+          cb(
+            new BadRequestException('Only JPEG and PNG images are allowed'),
+            false,
+          );
+        }
+      },
+      limits: {
+        fileSize: 2 * 1024 * 1024,
+      },
+    }),
+  )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,
@@ -44,7 +62,30 @@ export class S3Controller {
 
   // @UseGuards(JwtAuthGuard)
   @Post('documents')
-  @UseInterceptors(FileInterceptor('document'))
+  @UseInterceptors(
+    FileInterceptor('document', {
+      fileFilter: (req, file, cb) => {
+        const allowedExtensions = ['.txt', '.pdf'];
+        const fileExtension = extname(file.originalname);
+        const mimeType = mimeTypes.lookup(fileExtension);
+
+        if (
+          allowedExtensions.includes(fileExtension) &&
+          (mimeType === 'text/plain' || mimeType === 'application/pdf')
+        ) {
+          cb(null, true);
+        } else {
+          cb(
+            new BadRequestException('Only .txt and .pdf files are allowed'),
+            false,
+          );
+        }
+      },
+      limits: {
+        fileSize: 2 * 1024 * 1024,
+      },
+    }),
+  )
   async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,
