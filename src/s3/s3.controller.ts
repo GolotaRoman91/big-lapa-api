@@ -16,7 +16,11 @@ import { S3Service } from './s3.service';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import * as mimeTypes from 'mime-types';
-import { extname } from 'path';
+import { extname, parse } from 'path';
+import { UploadImageDto } from './dto/uploadImage.dto';
+import { UploadDocumentDto } from './dto/uploadDocument.dto';
+
+const singleExtensionRegex = /^[^.]+\.[a-zA-Z0-9]+$/;
 
 @Controller('images')
 export class S3Controller {
@@ -38,6 +42,16 @@ export class S3Controller {
           file.mimetype === 'image/png' ||
           file.mimetype === 'image/x-icon'
         ) {
+          if (!singleExtensionRegex.test(file.originalname)) {
+            cb(
+              new BadRequestException(
+                'Invalid file name. Double extensions are not allowed.',
+              ),
+              false,
+            );
+            return;
+          }
+
           cb(null, true);
         } else {
           cb(
@@ -55,7 +69,7 @@ export class S3Controller {
   )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
+    @Body() body: UploadImageDto,
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
@@ -81,11 +95,21 @@ export class S3Controller {
             mimeType === 'application/pdf' ||
             mimeType === 'application/msword')
         ) {
+          if (!singleExtensionRegex.test(file.originalname)) {
+            cb(
+              new BadRequestException(
+                'Invalid file name. Double extensions are not allowed.',
+              ),
+              false,
+            );
+            return;
+          }
+
           cb(null, true);
         } else {
           cb(
             new BadRequestException(
-              'Only .txt .doc and .pdf files are allowed',
+              'Only .txt, .doc, and .pdf files are allowed',
             ),
             false,
           );
@@ -98,7 +122,7 @@ export class S3Controller {
   )
   async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
+    @Body() body: UploadDocumentDto,
   ) {
     if (!file) {
       throw new BadRequestException('No document uploaded');
@@ -131,13 +155,13 @@ export class S3Controller {
   @Delete(':key')
   async deleteImage(@Param('key') key: string) {
     await this.s3Service.deleteFile(key);
-    return { message: 'File deleted successfully' };
+    return { message: 'Image deleted successfully' };
   }
 
   // @UseGuards(JwtAuthGuard)
   @Delete('documents/:key')
   async deleteFile(@Param('key') key: string) {
     await this.s3Service.deleteDocument(key);
-    return { message: 'File deleted successfully' };
+    return { message: 'Document deleted successfully' };
   }
 }
