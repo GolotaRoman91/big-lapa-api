@@ -33,11 +33,17 @@ export class S3Controller {
   @UseInterceptors(
     FileInterceptor('image', {
       fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+        if (
+          file.mimetype === 'image/jpeg' ||
+          file.mimetype === 'image/png' ||
+          file.mimetype === 'image/x-icon'
+        ) {
           cb(null, true);
         } else {
           cb(
-            new BadRequestException('Only JPEG and PNG images are allowed'),
+            new BadRequestException(
+              'Only .JPEG .ICO and .PNG images are allowed',
+            ),
             false,
           );
         }
@@ -65,18 +71,22 @@ export class S3Controller {
   @UseInterceptors(
     FileInterceptor('document', {
       fileFilter: (req, file, cb) => {
-        const allowedExtensions = ['.txt', '.pdf'];
+        const allowedExtensions = ['.txt', '.pdf', '.doc'];
         const fileExtension = extname(file.originalname);
         const mimeType = mimeTypes.lookup(fileExtension);
 
         if (
           allowedExtensions.includes(fileExtension) &&
-          (mimeType === 'text/plain' || mimeType === 'application/pdf')
+          (mimeType === 'text/plain' ||
+            mimeType === 'application/pdf' ||
+            mimeType === 'application/msword')
         ) {
           cb(null, true);
         } else {
           cb(
-            new BadRequestException('Only .txt and .pdf files are allowed'),
+            new BadRequestException(
+              'Only .txt .doc and .pdf files are allowed',
+            ),
             false,
           );
         }
