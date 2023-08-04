@@ -10,6 +10,7 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from './s3.service';
@@ -21,6 +22,7 @@ import { UploadImageDto } from './dto/uploadImage.dto';
 import { UploadDocumentDto } from './dto/uploadDocument.dto';
 
 const singleExtensionRegex = /^[^.]+\.[a-zA-Z0-9]+$/;
+const logger = new Logger();
 
 @Controller('images')
 export class S3Controller {
@@ -36,11 +38,13 @@ export class S3Controller {
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
-      fileFilter: (req, file, cb) => {
+      fileFilter: (req, file: Express.Multer.File, cb) => {
+        logger.log(`File mimetype: ${file.mimetype}`);
         if (
-          file.mimetype === 'image/jpeg' ||
-          file.mimetype === 'image/png' ||
-          file.mimetype === 'image/x-icon'
+          file &&
+          (file.mimetype === 'image/jpeg' ||
+            file.mimetype === 'image/png' ||
+            file.mimetype === 'image/vnd.microsoft.icon')
         ) {
           if (!singleExtensionRegex.test(file.originalname)) {
             cb(
@@ -85,6 +89,7 @@ export class S3Controller {
   @UseInterceptors(
     FileInterceptor('document', {
       fileFilter: (req, file, cb) => {
+        logger.log(`File mimetype: ${file.mimetype}`);
         const allowedExtensions = ['.txt', '.pdf', '.doc'];
         const fileExtension = extname(file.originalname);
         const mimeType = mimeTypes.lookup(fileExtension);
