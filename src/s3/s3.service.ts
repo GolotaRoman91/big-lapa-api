@@ -6,6 +6,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { Model, Types } from 'mongoose';
 import { Image } from './image.model';
 import { Document } from './document.model';
+import { Readable } from 'stream';
 
 const unlinkFile = promisify(fs.unlink);
 
@@ -52,13 +53,18 @@ export class S3Service {
     return result.Key;
   }
 
-  getFileStream(fileKey: string): any {
-    const downloadParams = {
+  async getFileStream(fileKey: string): Promise<Readable> {
+    const params = {
       Key: fileKey,
       Bucket: process.env.AWS_BUCKET_NAME,
     };
 
-    return this.s3.getObject(downloadParams).createReadStream();
+    try {
+      await this.s3.headObject(params).promise();
+      return this.s3.getObject(params).createReadStream();
+    } catch (error) {
+      throw new NotFoundException('File not found');
+    }
   }
 
   async getImagesByCategory(category: string): Promise<Image[]> {

@@ -30,7 +30,7 @@ export class S3Controller {
 
   @Get(':key')
   async getImage(@Param('key') key: string, @Res() res: Response) {
-    const fileStream = this.s3Service.getFileStream(key);
+    const fileStream = await this.s3Service.getFileStream(key);
     fileStream.pipe(res);
   }
 
