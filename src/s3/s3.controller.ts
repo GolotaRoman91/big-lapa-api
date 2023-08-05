@@ -34,6 +34,18 @@ export class S3Controller {
     fileStream.pipe(res);
   }
 
+  @Get('documents/:key')
+  async getDocument(@Param('key') key: string, @Res() res: Response) {
+    try {
+      const fileStream = await this.s3Service.getFileStream(key);
+      res.setHeader('Content-Disposition', `attachment; filename=${key}`);
+      res.setHeader('Content-Type', 'application/pdf');
+      fileStream.pipe(res);
+    } catch (error) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+  }
+
   // @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
@@ -150,10 +162,19 @@ export class S3Controller {
   }
 
   @Get('documents/category/:category')
-  async getDocumentsByCategory(@Param('category') category: string) {
-    const documents = await this.s3Service.getDocumentsByCategory(category);
-    const documentUrls = documents.map((document) => document.documentURI);
-    return documentUrls;
+  async getDocumentsByCategory(
+    @Param('category') category: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const documents = await this.s3Service.getDocumentsByCategory(category);
+      const documentUrls = documents.map((document) => document.documentURI);
+      return res.json(documentUrls);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error while fetching documents', error });
+    }
   }
 
   // @UseGuards(JwtAuthGuard)
