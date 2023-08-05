@@ -38,8 +38,16 @@ export class S3Controller {
   async getDocument(@Param('key') key: string, @Res() res: Response) {
     try {
       const fileStream = await this.s3Service.getFileStream(key);
+
+      const mimeType = mimeTypes.lookup(key); // Get the mime type based on the file extension
+
+      if (!mimeType) {
+        res.setHeader('Content-Type', 'application/octet-stream');
+      } else {
+        res.setHeader('Content-Type', mimeType);
+      }
+
       res.setHeader('Content-Disposition', `attachment; filename=${key}`);
-      res.setHeader('Content-Type', 'application/pdf');
       fileStream.pipe(res);
     } catch (error) {
       return res.status(404).json({ message: 'Document not found' });
