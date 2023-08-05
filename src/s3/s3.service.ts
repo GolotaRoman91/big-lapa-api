@@ -67,23 +67,6 @@ export class S3Service {
     }
   }
 
-  async getDocumentStream(documentKey: string): Promise<Readable> {
-    const params = {
-      Key: documentKey,
-      Bucket: process.env.AWS_BUCKET_NAME,
-    };
-
-    try {
-      // Check the existence of the object in the S3 bucket
-      await this.s3.headObject(params).promise();
-      // If the object exists, return the stream directly
-      return this.s3.getObject(params).createReadStream();
-    } catch (error) {
-      // If the object doesn't exist, throw a NotFoundException
-      throw new NotFoundException('Document not found');
-    }
-  }
-
   async getImagesByCategory(category: string): Promise<Image[]> {
     return this.imageModel.find({ category }).exec();
   }
@@ -94,11 +77,11 @@ export class S3Service {
     category: string,
   ): Promise<string> {
     const fileStream = fs.createReadStream(file.path);
-
+    const key = file.originalname;
     const uploadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Body: fileStream,
-      Key: file.filename,
+      Key: key,
     };
 
     const result = await this.s3.upload(uploadParams).promise();
