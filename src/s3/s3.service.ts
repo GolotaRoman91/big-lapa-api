@@ -31,11 +31,11 @@ export class S3Service {
     category: string,
   ): Promise<string> {
     const fileStream = fs.createReadStream(file.path);
-
+    const key = file.originalname;
     const uploadParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Body: fileStream,
-      Key: file.filename,
+      Key: key,
     };
 
     const result = await this.s3.upload(uploadParams).promise();
