@@ -4,7 +4,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { MainModel } from './mainPage.model/mainPage.model';
 import { Model } from 'mongoose';
 import { MainDto } from './dto/mainPage.dto';
-import { getModelForClass } from '@typegoose/typegoose'; // Import from the correct path
+import { getModelForClass } from '@typegoose/typegoose';
 
 @Injectable()
 export class MainService {
