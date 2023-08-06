@@ -39,7 +39,7 @@ export class S3Controller {
     try {
       const fileStream = await this.s3Service.getFileStream(key);
 
-      const mimeType = mimeTypes.lookup(key); // Get the mime type based on the file extension
+      const mimeType = mimeTypes.lookup(key);
 
       if (!mimeType) {
         res.setHeader('Content-Type', 'application/octet-stream');
