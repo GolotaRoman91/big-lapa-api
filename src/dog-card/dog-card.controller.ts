@@ -7,60 +7,61 @@ import {
   Delete,
   Res,
   NotFoundException,
-} from '@nestjs/common';
-import { DogCard } from './dog-card.model';
-import { DogCardService } from './dog-card.service';
-import { Response } from 'express';
+} from '@nestjs/common'
+import { DogCard } from './dog-card.model'
+import { DogCardService } from './dog-card.service'
+import { Response } from 'express'
+import { ApiTagController } from 'src/shared/decorators/ApiTagController'
 
-@Controller('dog-cards')
+@ApiTagController('dog-cards')
 export class DogCardController {
-  constructor(private readonly dogCardService: DogCardService) {}
+  constructor (private readonly dogCardService: DogCardService) {}
 
   @Post()
-  async createDogCard(@Body() data: DogCard): Promise<DogCard> {
-    return this.dogCardService.createDogCard(data);
+  async createDogCard (@Body() data: DogCard): Promise<DogCard> {
+    return this.dogCardService.createDogCard(data)
   }
 
   @Get()
-  async getAllDogCards(): Promise<DogCard[]> {
-    return this.dogCardService.getAllDogCards();
+  async getAllDogCards (): Promise<DogCard[]> {
+    return this.dogCardService.getAllDogCards()
   }
 
   @Get(':id')
-  async getDogCardById(
+  async getDogCardById (
     @Param('id') id: string,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      const dogCard = await this.dogCardService.getDogCardById(id);
+      const dogCard = await this.dogCardService.getDogCardById(id)
 
       if (!dogCard) {
-        res.status(404).json({ message: `Dog card with id ${id} not found` });
+        res.status(404).json({ message: `Dog card with id ${id} not found` })
       } else {
-        res.status(200).json(dogCard);
+        res.status(200).json(dogCard)
       }
     } catch (error) {
       if (error instanceof NotFoundException) {
-        res.status(404).json({ message: error.message });
+        res.status(404).json({ message: error.message })
       } else {
-        res.status(500).json({ message: 'An error occurred' });
+        res.status(500).json({ message: 'An error occurred' })
       }
     }
   }
 
   @Delete(':id')
-  async deleteDogCard(
+  async deleteDogCard (
     @Param('id') id: string,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      await this.dogCardService.deleteDogCardById(id);
-      res.status(200).json({ message: 'Dog card deleted successfully' });
+      await this.dogCardService.deleteDogCardById(id)
+      res.status(200).json({ message: 'Dog card deleted successfully' })
     } catch (error) {
       if (error instanceof NotFoundException) {
-        res.status(404).json({ message: error.message });
+        res.status(404).json({ message: error.message })
       } else {
-        res.status(500).json({ message: 'An error occurred' });
+        res.status(500).json({ message: 'An error occurred' })
       }
     }
   }

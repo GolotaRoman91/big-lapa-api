@@ -1,30 +1,30 @@
-import { prop } from '@typegoose/typegoose';
+import { prop } from '@typegoose/typegoose'
 
 export class DogCard {
   @prop({ required: true })
-  mainPhoto: string;
+  mainPhoto: string
+
+  @prop({ required: true, type: () => [String] })
+  photos: string[]
 
   @prop({ required: true })
-  photos: string[];
+  name: string
 
   @prop({ required: true })
-  name: string;
+  sex: string
 
   @prop({ required: true })
-  sex: string;
+  age: string
 
   @prop({ required: true })
-  age: string;
+  haschip: boolean
 
   @prop({ required: true })
-  haschip: boolean;
-
-  @prop({ required: true })
-  hasbreed: boolean;
+  hasbreed: boolean
 
   @prop()
-  breed?: string;
+  breed?: string
 
   @prop({ required: true })
-  size: string;
+  size: string
 }
