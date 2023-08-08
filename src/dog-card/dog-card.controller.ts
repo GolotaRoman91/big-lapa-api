@@ -48,6 +48,7 @@ export class DogCardController {
     }
   }
 
+  @Delete(':id')
   async deleteDogCard(
     @Param('id') id: string,
     @Res() res: Response,
