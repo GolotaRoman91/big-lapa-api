@@ -7,6 +7,7 @@ import { getMongoConfig } from './configs/mongo.config';
 import { AuthModule } from './auth/auth.module';
 import { MainModule } from './mainPage/mainPage.module';
 import { S3Module } from './s3/s3.module';
+import { DogCardModule } from './dog-card/dog-card.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { S3Module } from './s3/s3.module';
     AuthModule,
     MainModule,
     S3Module,
+    DogCardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
