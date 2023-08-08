@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { DogCard } from './dog-card.model';
 import { DogCardService } from './dog-card.service';
@@ -26,16 +27,40 @@ export class DogCardController {
   }
 
   @Get(':id')
-  async getDogCardById(@Param('_id') id: number): Promise<DogCard | null> {
-    return this.dogCardService.getDogCardById(id);
+  async getDogCardById(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const dogCard = await this.dogCardService.getDogCardById(id);
+
+      if (!dogCard) {
+        res.status(404).json({ message: `Dog card with id ${id} not found` });
+      } else {
+        res.status(200).json(dogCard);
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An error occurred' });
+      }
+    }
   }
 
-  @Delete(':id')
   async deleteDogCard(
     @Param('id') id: string,
     @Res() res: Response,
   ): Promise<void> {
-    await this.dogCardService.deleteDogCardById(id);
-    res.status(200).json({ message: 'Dog card deleted successfully' });
+    try {
+      await this.dogCardService.deleteDogCardById(id);
+      res.status(200).json({ message: 'Dog card deleted successfully' });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An error occurred' });
+      }
+    }
   }
 }

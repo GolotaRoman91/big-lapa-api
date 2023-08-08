@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DogCard } from './dog-card.model';
 import { InjectModel } from 'nestjs-typegoose';
 import { Model } from 'mongoose';
@@ -12,8 +12,13 @@ export class DogCardService {
     return createdDogCard.toObject();
   }
 
-  async getDogCardById(id: number): Promise<DogCard | null> {
-    const dogCard = await this.dogCardModel.findOne({ id }).exec();
+  async getDogCardById(id: string): Promise<DogCard | null> {
+    const dogCard = await this.dogCardModel.findById(id).exec();
+
+    if (!dogCard) {
+      throw new NotFoundException(`Dog card with id ${id} not found`);
+    }
+
     return dogCard;
   }
 
@@ -23,6 +28,11 @@ export class DogCardService {
   }
 
   async deleteDogCardById(id: string): Promise<void> {
+    const dogCard = await this.dogCardModel.findById(id).exec();
+
+    if (!dogCard) {
+      throw new NotFoundException(`Dog card with id ${id} not found`);
+    }
     await this.dogCardModel.findByIdAndDelete(id).exec();
   }
 }
