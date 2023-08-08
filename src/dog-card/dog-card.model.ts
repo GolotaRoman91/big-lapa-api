@@ -23,6 +23,9 @@ export class DogCard {
   hasbreed: boolean;
 
   @prop()
+  description?: string;
+
+  @prop()
   breed?: string;
 
   @prop({ required: true })
