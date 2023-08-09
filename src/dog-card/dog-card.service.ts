@@ -23,19 +23,20 @@ export class DogCardService {
       throw new NotFoundException(`Dog card with id ${id} not found`);
     }
 
-    existingDogCard.name = data.name;
-    existingDogCard.sex = data.sex;
-    existingDogCard.age = data.age;
-    existingDogCard.breed = data.breed;
-    existingDogCard.size = data.size;
-
-    if (data.mainPhoto !== undefined) {
-      existingDogCard.mainPhoto = data.mainPhoto;
-    }
-
-    if (data.photos !== undefined) {
-      existingDogCard.photos = data.photos;
-    }
+    existingDogCard.name =
+      data.name !== undefined ? data.name : existingDogCard.name;
+    existingDogCard.sex =
+      data.sex !== undefined ? data.sex : existingDogCard.sex;
+    existingDogCard.age =
+      data.age !== undefined ? data.age : existingDogCard.age;
+    existingDogCard.breed =
+      data.breed !== undefined ? data.breed : existingDogCard.breed;
+    existingDogCard.size =
+      data.size !== undefined ? data.size : existingDogCard.size;
+    existingDogCard.mainPhoto =
+      data.mainPhoto !== undefined ? data.mainPhoto : existingDogCard.mainPhoto;
+    existingDogCard.photos =
+      data.photos !== undefined ? data.photos : existingDogCard.photos;
 
     const updatedDogCard = await existingDogCard.save();
     return updatedDogCard.toObject();

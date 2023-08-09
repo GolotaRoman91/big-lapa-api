@@ -12,6 +12,7 @@ import {
   ValidationPipe,
   BadRequestException,
   Put,
+  Patch,
 } from '@nestjs/common';
 import { DogCard } from './dog-card.model';
 import { DogCardService } from './dog-card.service';
@@ -40,10 +41,11 @@ export class DogCardController {
     }
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateDogCard(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) data: UpdateDogCardDto,
+    @Body(new ValidationPipe({ skipMissingProperties: true }))
+    data: UpdateDogCardDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
