@@ -3,8 +3,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
 import { TypegooseModule } from 'nestjs-typegoose';
-import { Image } from './image.model';
-import { Document } from './document.model';
+import { Image } from './models/image.model';
+import { Document } from './models/document.model';
 
 @Module({
   imports: [

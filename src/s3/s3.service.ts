@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { InjectModel } from 'nestjs-typegoose';
 import { Model, Types } from 'mongoose';
-import { Image } from './image.model';
-import { Document } from './document.model';
+import { Image } from './models/image.model';
+import { Document } from './models/document.model';
 import { Readable } from 'stream';
 
 const unlinkFile = promisify(fs.unlink);
