@@ -1,11 +1,12 @@
-import { prop } from '@typegoose/typegoose';
+import { prop, Ref } from '@typegoose/typegoose';
+import { DogPhotoType } from './dog-photo-type.model';
 
 export class DogCard {
   @prop({ required: true })
   mainPhoto: string;
 
-  @prop({ required: true })
-  photos: string[];
+  @prop({ required: true, type: () => DogPhotoType })
+  photos: Ref<DogPhotoType>[];
 
   @prop({ required: true })
   name: string;
@@ -21,6 +22,9 @@ export class DogCard {
 
   @prop({ required: true })
   hasbreed: boolean;
+
+  @prop()
+  description?: string;
 
   @prop()
   breed?: string;
