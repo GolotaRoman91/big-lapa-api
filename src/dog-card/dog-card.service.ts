@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DogCard } from './dog-card.model';
+import { DogCard } from './models/dog-card.model';
 import { InjectModel } from 'nestjs-typegoose';
 import { Model } from 'mongoose';
 import { UpdateDogCardDto } from './dto/update-dog-card.dto';

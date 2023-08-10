@@ -6,46 +6,63 @@ import {
   Param,
   Delete,
   Res,
-  NotFoundException,
-  HttpException,
-  HttpStatus,
-  ValidationPipe,
-  BadRequestException,
-  Put,
   Patch,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
-import { DogCard } from './dog-card.model';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
+import { DogCard } from './models/dog-card.model';
 import { DogCardService } from './dog-card.service';
 import { Response } from 'express';
 import { CreateDogCardDto } from './dto/create-dog-card.dto';
 import { UpdateDogCardDto } from './dto/update-dog-card.dto';
 
 @Controller('dog-cards')
+@ApiTags('dog-cards')
 export class DogCardController {
   constructor(private readonly dogCardService: DogCardService) {}
 
+  @ApiOperation({ summary: 'Create a new dog card' })
+  @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateDogCardDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Dog card created successfully',
+    type: DogCard,
+  })
   @Post()
-  async createDogCard(
-    @Body(new ValidationPipe()) data: CreateDogCardDto,
-  ): Promise<DogCard> {
-    try {
-      return this.dogCardService.createDogCard(data);
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new HttpException(
-          { message: 'Validation failed', errors: error.getResponse() },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
-    }
+  async createDogCard(@Body() data: CreateDogCardDto): Promise<DogCard> {
+    return this.dogCardService.createDogCard(data);
   }
 
+  @ApiOperation({ summary: 'Update a dog card by ID' })
+  @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiNotFoundResponse({ description: 'Dog card not found' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBearerAuth()
+  @ApiParam({ name: 'id', description: 'Dog card ID' })
+  @ApiBody({ type: UpdateDogCardDto })
+  @ApiOkResponse({
+    description: 'Dog card updated successfully',
+    type: DogCard,
+  })
   @Patch(':id')
   async updateDogCard(
     @Param('id') id: string,
-    @Body(new ValidationPipe({ skipMissingProperties: true }))
-    data: UpdateDogCardDto,
+    @Body() data: UpdateDogCardDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
@@ -67,11 +84,19 @@ export class DogCardController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all dog cards' })
+  @ApiOkResponse({ description: 'List of all dog cards', type: [DogCard] })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
   @Get()
   async getAllDogCards(): Promise<DogCard[]> {
     return this.dogCardService.getAllDogCards();
   }
 
+  @ApiOperation({ summary: 'Get a dog card by ID' })
+  @ApiNotFoundResponse({ description: 'Dog card not found' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiParam({ name: 'id', description: 'Dog card ID' })
+  @ApiOkResponse({ description: 'Dog card found', type: DogCard })
   @Get(':id')
   async getDogCardById(
     @Param('id') id: string,
@@ -94,6 +119,12 @@ export class DogCardController {
     }
   }
 
+  @ApiOperation({ summary: 'Delete a dog card by ID' })
+  @ApiNotFoundResponse({ description: 'Dog card not found' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBearerAuth()
+  @ApiParam({ name: 'id', description: 'Dog card ID' })
+  @ApiOkResponse({ description: 'Dog card deleted successfully' })
   @Delete(':id')
   async deleteDogCard(
     @Param('id') id: string,
