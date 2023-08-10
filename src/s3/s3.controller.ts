@@ -20,20 +20,42 @@ import * as mimeTypes from 'mime-types';
 import { extname, parse } from 'path';
 import { UploadImageDto } from './dto/uploadImage.dto';
 import { UploadDocumentDto } from './dto/uploadDocument.dto';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 const singleExtensionRegex = /^[^.]+\.[a-zA-Z0-9]+$/;
 const logger = new Logger();
 
 @Controller('images')
+@ApiTags('images')
 export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}
 
+  @ApiOperation({ summary: 'Get an image by key' })
+  @ApiParam({ name: 'key', description: 'Image key' })
+  @ApiOkResponse({ description: 'Image retrieved successfully' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
   @Get(':key')
   async getImage(@Param('key') key: string, @Res() res: Response) {
     const fileStream = await this.s3Service.getFileStream(key);
     fileStream.pipe(res);
   }
 
+  @ApiOperation({ summary: 'Get a document by key' })
+  @ApiParam({ name: 'key', description: 'Document key' })
+  @ApiOkResponse({ description: 'Document retrieved successfully' })
+  @ApiNotFoundResponse({ description: 'Document not found' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
   @Get('documents/:key')
   async getDocument(@Param('key') key: string, @Res() res: Response) {
     try {
@@ -55,6 +77,13 @@ export class S3Controller {
   }
 
   // @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Upload an image' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Invalid file or format' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBody({ type: UploadImageDto })
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: 'Image uploaded successfully' })
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
@@ -105,6 +134,13 @@ export class S3Controller {
   }
 
   // @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Upload a document' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBadRequestResponse({ description: 'Invalid file or format' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBody({ type: UploadDocumentDto })
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: 'Document uploaded successfully' })
   @Post('documents')
   @UseInterceptors(
     FileInterceptor('document', {
@@ -162,6 +198,10 @@ export class S3Controller {
     return { documentUrl: key };
   }
 
+  @ApiOperation({ summary: 'Get images by category' })
+  @ApiParam({ name: 'category', description: 'Category of images' })
+  @ApiOkResponse({ description: 'Images retrieved successfully' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
   @Get('category/:category')
   async getImagesByCategory(@Param('category') category: string) {
     const images = await this.s3Service.getImagesByCategory(category);
@@ -169,6 +209,10 @@ export class S3Controller {
     return imageUrls;
   }
 
+  @ApiOperation({ summary: 'Get documents by category' })
+  @ApiParam({ name: 'category', description: 'Category of documents' })
+  @ApiOkResponse({ description: 'Documents retrieved successfully' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
   @Get('documents/category/:category')
   async getDocumentsByCategory(
     @Param('category') category: string,
@@ -186,6 +230,13 @@ export class S3Controller {
   }
 
   // @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete an image' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBearerAuth()
+  @ApiParam({ name: 'key', description: 'Image key' })
+  @ApiOkResponse({ description: 'Image deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Image not found' })
   @Delete(':key')
   async deleteImage(@Param('key') key: string) {
     await this.s3Service.deleteFile(key);
@@ -193,6 +244,13 @@ export class S3Controller {
   }
 
   // @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete a document' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse({ description: 'An error occurred' })
+  @ApiBearerAuth()
+  @ApiParam({ name: 'key', description: 'Document key' })
+  @ApiOkResponse({ description: 'Document deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Document not found' })
   @Delete('documents/:key')
   async deleteFile(@Param('key') key: string) {
     await this.s3Service.deleteDocument(key);
