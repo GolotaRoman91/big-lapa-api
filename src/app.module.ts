@@ -10,6 +10,7 @@ import { S3Module } from './s3/s3.module'
 import { DogCardModule } from './dog-card/dog-card.module'
 import { BackblazeModule } from './backblaze/backblaze.module'
 import { envValidationSchea } from './configs/env.config'
+import { FilesModule } from './files/files.module'
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { envValidationSchea } from './configs/env.config'
     }),
     AuthModule,
     MainModule,
-    S3Module,
+    // S3Module,
+    FilesModule,
     BackblazeModule,
     DogCardModule,
   ],
